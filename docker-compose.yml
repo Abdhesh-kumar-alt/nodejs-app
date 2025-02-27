@@ -1,0 +1,52 @@
+version: '3.7'
+
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: abdhesh
+      MONGO_INITDB_ROOT_PASSWORD: Abd%$#!
+      MONGO_INITDB_DATABASE: mydb  # Set default database name
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    networks: 
+      - backend    
+
+  backend:
+    build: backend/.
+    container_name: backend
+    restart: always
+    depends_on:
+      - mongodb
+    environment:
+      - RESTREVIEWS_DB_URI=mongodb://abdhesh:Abd%$#!@mongodb:27017/mydb?authSource=admin
+      - RESTREVIEWS_NS=sample_restaurants
+      - PORT=8000  
+    ports:
+      - "8000:8000"
+    networks: 
+      - backend   
+
+  frontend:
+    build: frontend/.
+    container_name: frontend
+    restart: always
+    depends_on:
+      - backend
+    ports:
+      - "3000:80"
+    networks: 
+      - backend
+
+volumes:
+  mongodb_data:
+
+networks:
+  backend:
+    # Use a custom driver
+    driver: bridge    
+
