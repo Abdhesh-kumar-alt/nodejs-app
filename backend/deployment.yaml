@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+        - name: backend
+          image: abdheshkumar12/nodejs-app-backend:v2  # Replace with the correct image if using a registry
+          ports:
+            - containerPort: 8000
+          env:
+            - name: RESTREVIEWS_DB_URI
+              value: "mongodb://abdhesh:Abd%$#!@mongodb-service:27017/mydb?authSource=admin"
+            - name: RESTREVIEWS_NS
+              value: "sample_restaurants"
+            - name: PORT
+              value: "8000"
+          imagePullPolicy: IfNotPresent
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-service
+spec:
+  selector:
+    app: backend
+  ports:
+    - protocol: TCP
+      port: 8000
+      targetPort: 8000
+  type: ClusterIP
+
